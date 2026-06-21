@@ -123,9 +123,17 @@ fun uninstall(callback: (String?) -> Unit) {
     // 1. 核心换心：优先使用 DPM 隐藏，绕开 ColorOS 拦截
     ph.safeDpmCall {
         try {
+            // 关键点！先尝试剥掉“默认浏览器”这个角色，撕掉它的防弹衣
+            try {
+                val roleManager = application.getSystemService(Context.ROLE_SERVICE) as android.app.role.RoleManager
+                roleManager.removeRoleFromHolder(android.app.role.ROLE_BROWSER, packageName)
+            } catch (_: Exception) {
+                // 如果系统不支持角色移除，或者目标没有这个角色，直接忽略报错
+            }
+
+            // 隐藏成功，更新 UI 里的开关状态
             val success = dpm.setApplicationHidden(dar, packageName, true)
             if (success) {
-                // 隐藏成功，更新 UI 里的开关状态
                 uiState.update { it.copy(hide = dpm.isApplicationHidden(dar, packageName)) }
                 callback(null)
             } else {
