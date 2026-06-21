@@ -1,17 +1,12 @@
-name: Release
+name: Debug Build
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '*'
 
 jobs:
   build:
-    name: Build
+    name: Build Debug APK
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -22,15 +17,13 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build APK
+      - name: Build Debug APK
         run: |
-          echo "${{ secrets.KEY_BASE64 }}" | base64 --decode - > app/release.jks
-          ./gradlew clean assembleRelease --no-build-cache --no-configuration-cache -PStoreFile="$(pwd)/app/release.jks" -PStorePassword="${{ secrets.KEYSTORE_PASSWORD }}" -PKeyPassword="${{ secrets.KEY_PASSWORD }}" -PKeyAlias="${{ secrets.KEY_ALIAS }}"
-          mv app/build/outputs/apk/release/app-release.apk OwnDroid-${{ github.ref_name }}.apk
-          ./gradlew assembleRelease
-          mv app/build/outputs/apk/release/app-release.apk OwnDroid-${{ github.ref_name }}-testkey.apk
+          ./gradlew clean assembleDebug
 
-      - name: Create release
-        run: git tag -l ${{ github.ref_name }} --format="%(contents:body)" | gh release create ${{ github.ref_name }} -t ${{ github.ref_name }} *.apk -d -F -
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OwnDroid-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
