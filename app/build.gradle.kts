@@ -31,23 +31,27 @@ android {
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
+    buildTypes {
+    release {
+        isMinifyEnabled = true
+        isShrinkResources = true
+        proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
-            )
-            signingConfig = signingConfigs.getByName("defaultSignature")
-        }
-        debug {
-            signingConfig = signingConfigs.getByName("defaultSignature")
-        }
-        create("fastDebug") {
-            initWith(getByName("debug"))
-            isDebuggable = false
-        }
+        )
+        signingConfig = signingConfigs.getByName("release")
     }
+    // ⬇️ 把这里改成带瘦身的 Debug 配置 ⬇️
+    debug {
+        isMinifyEnabled = true
+        isShrinkResources = true
+        proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+        )
+        // 不留 signingConfig，自用 Debug 签名即可
+    }
+}
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
