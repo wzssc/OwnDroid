@@ -30,7 +30,7 @@ android {
         multiDexEnabled = false
     }
 
-    buildTypes {
+
     buildTypes {
     release {
         isMinifyEnabled = true
