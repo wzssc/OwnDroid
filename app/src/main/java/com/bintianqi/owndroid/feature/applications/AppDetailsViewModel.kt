@@ -142,3 +142,4 @@ fun uninstall(callback: (String?) -> Unit) {
         uninstallPackage(application, ph, packageName, callback)
     }
 }
+}
