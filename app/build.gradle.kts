@@ -7,14 +7,6 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        create("defaultSignature") {
-            storeFile = file(project.findProperty("StoreFile") ?: "testkey.jks")
-            storePassword = (project.findProperty("StorePassword") as String?) ?: "testkey"
-            keyPassword = (project.findProperty("KeyPassword") as String?) ?: "testkey"
-            keyAlias = (project.findProperty("KeyAlias") as String?) ?: "testkey"
-        }
-    }
     namespace = "com.bintianqi.owndroid"
     compileSdk = 36
 
@@ -38,7 +30,6 @@ android {
                     getDefaultProguardFile("proguard-android-optimize.txt"),
                     "proguard-rules.pro"
             )
-            // 移除了缺失的 signingConfig，避免云编译报错
         }
         debug {
             isMinifyEnabled = true
@@ -47,7 +38,6 @@ android {
                     getDefaultProguardFile("proguard-android-optimize.txt"),
                     "proguard-rules.pro"
             )
-            // 调试版使用默认的 Android Debug 签名，云端直接编译
         }
     }
 
