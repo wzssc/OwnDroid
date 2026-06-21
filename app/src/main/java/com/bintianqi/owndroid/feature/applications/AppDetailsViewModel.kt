@@ -119,7 +119,6 @@ class AppDetailsViewModel(
             toastChannel.sendStatus(result)
         }
     }
-
 fun uninstall(callback: (String?) -> Unit) {
     // 1. 核心换心：优先使用 DPM 隐藏，绕开 ColorOS 拦截
     ph.safeDpmCall {
@@ -142,4 +141,4 @@ fun uninstall(callback: (String?) -> Unit) {
         // 如果没拿到 DPM 权限，走原版卸载
         uninstallPackage(application, ph, packageName, callback)
     }
-}
+} // <--- 注意：这里补上了之前漏掉的大括号！
