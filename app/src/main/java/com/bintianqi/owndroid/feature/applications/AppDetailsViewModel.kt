@@ -120,16 +120,15 @@ class AppDetailsViewModel(
         }
     }
 fun uninstall(callback: (String?) -> Unit) {
-    // 1. 核心换心：优先使用 DPM 隐藏，绕开 ColorOS 拦截
     ph.safeDpmCall {
         try {
-            // 关键点：如果当前安卓版本 >= 10 (API 29)，尝试先剥夺浏览器的默认角色
-            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            // 如果安卓版本 >= 10 (API 29)，尝试先剥夺浏览器的默认角色
+            if (VERSION.SDK_INT >= 29) {
                 try {
-                    val roleManager = application.getSystemService(Context.ROLE_SERVICE) as RoleManager
-                    roleManager.removeRoleFromHolder(RoleManager.ROLE_BROWSER, packageName)
+                    val roleManager = application.getSystemService(android.content.Context.ROLE_SERVICE) as android.app.role.RoleManager
+                    roleManager.removeRoleFromHolder(android.app.role.RoleManager.ROLE_BROWSER, packageName)
                 } catch (_: Exception) {
-                    // 如果系统不支持角色移除，或者目标没有这个角色，直接忽略报错
+                    // 系统不支持或应用无该角色，忽略
                 }
             }
 
