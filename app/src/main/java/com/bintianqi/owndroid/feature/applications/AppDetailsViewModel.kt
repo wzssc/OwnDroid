@@ -120,7 +120,26 @@ class AppDetailsViewModel(
         }
     }
 
-    fun uninstall(callback: (String?) -> Unit) {
+fun uninstall(callback: (String?) -> Unit) {
+    // 1. 核心换心：借用 DPM 权限尝试“隐藏”，绕开 ColorOS 拦截
+    ph.safeDpmCall { dpm ->
+        try {
+            val success = dpm.setApplicationHidden(dar, packageName, true)
+            if (success) {
+                // 如果隐藏成功，更新 UI 里的开关状态
+                uiState.update { it.copy(hide = dpm.isApplicationHidden(dar, packageName)) }
+                callback(null)
+            } else {
+                // 2. 如果隐藏失败（比如遇到极特殊情况），回退到原版卸载方法
+                uninstallPackage(application, ph, packageName, callback)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // 3. 异常兜底，依然走原版卸载
+            uninstallPackage(application, ph, packageName, callback)
+        }
+    } ?: run {
+        // 4. 如果没拿到 DPM 权限，走原版卸载
         uninstallPackage(application, ph, packageName, callback)
     }
 }
