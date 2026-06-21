@@ -141,4 +141,4 @@ fun uninstall(callback: (String?) -> Unit) {
         // 如果没拿到 DPM 权限，走原版卸载
         uninstallPackage(application, ph, packageName, callback)
     }
-} // <--- 注意：这里补上了之前漏掉的大括号！
+}
