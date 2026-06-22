@@ -119,29 +119,31 @@ class AppDetailsViewModel(
             toastChannel.sendStatus(result)
         }
     }
-fun uninstall(callback: (String?) -> Unit) {
-    // 1. 赛博第一刀：直接抛底层 Shell 命令尝试剥离角色（无任何 API 依赖）
-    try {
-        Runtime.getRuntime().exec("cmd role remove android.app.role.BROWSER ${packageName}")
-    } catch (e: Exception) {
-        // 忽略所有系统拦截或错误
-    }
 
-    // 2. 赛博第二刀：执行隐藏逻辑
-    ph.safeDpmCall {
+    fun uninstall(callback: (String?) -> Unit) {
+        // 1. 赛博第一刀：直接抛底层 Shell 命令尝试剥离角色（无任何 API 依赖）
         try {
-            val success = dpm.setApplicationHidden(dar, packageName, true)
-            if (success) {
-                uiState.update { it.copy(hide = dpm.isApplicationHidden(dar, packageName)) }
-                callback(null)
-            } else {
+            Runtime.getRuntime().exec("cmd role remove android.app.role.BROWSER ${packageName}")
+        } catch (e: Exception) {
+            // 忽略所有系统拦截或错误
+        }
+
+        // 2. 赛博第二刀：执行隐藏逻辑
+        ph.safeDpmCall {
+            try {
+                val success = dpm.setApplicationHidden(dar, packageName, true)
+                if (success) {
+                    uiState.update { it.copy(hide = dpm.isApplicationHidden(dar, packageName)) }
+                    callback(null)
+                } else {
+                    uninstallPackage(application, ph, packageName, callback)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
                 uninstallPackage(application, ph, packageName, callback)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } ?: run {
             uninstallPackage(application, ph, packageName, callback)
         }
-    } ?: run {
-        uninstallPackage(application, ph, packageName, callback)
     }
 }
