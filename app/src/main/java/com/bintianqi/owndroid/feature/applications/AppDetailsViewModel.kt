@@ -119,20 +119,15 @@ class AppDetailsViewModel(
             toastChannel.sendStatus(result)
         }
     }
-
 fun uninstall(callback: (String?) -> Unit) {
-    // 1. 赛博第一刀：尝试用 Java API 强行剥夺系统默认浏览器角色（无论它是否被拦截）
-    if (VERSION.SDK_INT >= 29) {
-        try {
-            val roleManager = application.getSystemService(android.content.Context.ROLE_SERVICE) as android.app.role.RoleManager
-            // 如果原版黑盒靠的就是这行，那它必生效
-            roleManager.removeRoleFromHolder(android.app.role.RoleManager.ROLE_BROWSER, packageName)
-        } catch (_: Exception) {
-            // 如果没生效或被系统拦截，什么都不做，直接走下一步
-        }
+    // 1. 赛博第一刀：直接抛底层 Shell 命令尝试剥离角色（无任何 API 依赖）
+    try {
+        Runtime.getRuntime().exec("cmd role remove android.app.role.BROWSER ${packageName}")
+    } catch (e: Exception) {
+        // 忽略所有系统拦截或错误
     }
 
-    // 2. 赛博第二刀：执行我们验证过的隐身逻辑
+    // 2. 赛博第二刀：执行隐藏逻辑
     ph.safeDpmCall {
         try {
             val success = dpm.setApplicationHidden(dar, packageName, true)
@@ -149,5 +144,4 @@ fun uninstall(callback: (String?) -> Unit) {
     } ?: run {
         uninstallPackage(application, ph, packageName, callback)
     }
-}
 }
