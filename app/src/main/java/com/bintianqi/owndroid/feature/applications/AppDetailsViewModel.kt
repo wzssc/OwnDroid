@@ -119,7 +119,7 @@ class AppDetailsViewModel(
             toastChannel.sendStatus(result)
         }
     }
-fun uninstall(callback: (String?) -> Unit) {
+
 fun uninstall(callback: (String?) -> Unit) {
     // 1. 赛博第一刀：尝试用 Java API 强行剥夺系统默认浏览器角色（无论它是否被拦截）
     if (VERSION.SDK_INT >= 29) {
